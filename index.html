@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6c5ce7">
+    <meta name="description" content="Aplicación de comunicación aumentativa con pictogramas">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>PictoLoco - Comunicación Aumentativa</title>
+    
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icon-192.svg">
+    <link rel="apple-touch-icon" href="assets/icon-192.svg">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header con oración actual -->
+        <header class="header">
+            <div class="header-top-row">
+                <h1 class="app-title">🗣️ PictoLoco</h1>
+                <button class="btn-header-search" id="btnSearch" aria-label="Buscar pictograma" title="Buscar">
+                    🔍
+                </button>
+            </div>
+            
+            <!-- Campo de oración: Hablar | campo | Corregir Borrar -->
+            <div class="sentence-field">
+                <button class="btn-action btn-speak" id="btnSpeak" aria-label="Reproducir oración" title="Hablar">
+                    <span class="btn-icon-text">💬</span>
+                    <span class="btn-label">Hablar</span>
+                </button>
+                <div class="sentence-input" id="sentenceInput">
+                    <div class="sentence-pictos" id="sentencePictos">
+                        <span class="sentence-placeholder">Toca pictogramas</span>
+                    </div>
+                    <div class="sentence-text" id="sentenceText" aria-live="polite"></div>
+                </div>
+                <div class="sentence-actions">
+                    <button class="btn-action btn-correct" id="btnCorrect" aria-label="Borrar último pictograma" title="Corregir">
+                        <span class="btn-icon-text">⬅️</span>
+                        <span class="btn-label">Corregir</span>
+                    </button>
+                    <button class="btn-action btn-clear" id="btnClear" aria-label="Borrar toda la oración" title="Borrar todo">
+                        <span class="btn-icon-text">🗑️</span>
+                        <span class="btn-label">Borrar</span>
+                    </button>
+                </div>
+            </div>
+            
+        </header>
+
+        <!-- Área principal: básicos + pictograma + categorías -->
+        <div class="main-area">
+            <!-- Scroll horizontal/vertical - Básicos -->
+            <aside class="basic-scroll-section">
+                <div class="horizontal-scroll" id="basicScroll">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </aside>
+
+            <!-- Scroll vertical/horizontal tipo TikTok - Categorías -->
+            <main class="picto-scroll-container">
+                <div class="picto-scroll" id="pictoScroll">
+                    <!-- Los pictogramas se cargan dinámicamente -->
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Cargando pictogramas...</p>
+                    </div>
+                </div>
+
+                <!-- Indicador de scroll -->
+                <div class="scroll-indicator" id="scrollIndicator">
+                    <span>Desliza para más</span>
+                    <div class="scroll-arrow">↓</div>
+                </div>
+            </main>
+
+            <!-- Scroll de categorías - ABAJO / DERECHA -->
+            <nav class="category-tabs-bottom" id="categoryTabs">
+            <!-- NÚCLEO -->
+            <button class="category-tab active" data-category="pronombres">
+                <span class="tab-icon">🧑</span>
+                <span class="tab-label">Yo/Tú</span>
+            </button>
+            <button class="category-tab" data-category="verbos">
+                <span class="tab-icon">💪</span>
+                <span class="tab-label">Verbos</span>
+            </button>
+            <button class="category-tab" data-category="preguntas">
+                <span class="tab-icon">❓</span>
+                <span class="tab-label">Preguntas</span>
+            </button>
+            <button class="category-tab" data-category="social">
+                <span class="tab-icon">👋</span>
+                <span class="tab-label">Social</span>
+            </button>
+            <button class="category-tab" data-category="adjetivos">
+                <span class="tab-icon">📏</span>
+                <span class="tab-label">Adjetivos</span>
+            </button>
+            <button class="category-tab" data-category="tiempo">
+                <span class="tab-icon">🕐</span>
+                <span class="tab-label">Tiempo</span>
+            </button>
+            <button class="category-tab" data-category="ubicacion">
+                <span class="tab-icon">📍</span>
+                <span class="tab-label">Lugar</span>
+            </button>
+            <!-- TEMÁTICAS -->
+            <button class="category-tab" data-category="necesidades">
+                <span class="tab-icon">🍎</span>
+                <span class="tab-label">Necesidades</span>
+            </button>
+            <button class="category-tab" data-category="acciones">
+                <span class="tab-icon">🏃</span>
+                <span class="tab-label">Acciones</span>
+            </button>
+            <button class="category-tab" data-category="emociones">
+                <span class="tab-icon">😊</span>
+                <span class="tab-label">Emociones</span>
+            </button>
+            <button class="category-tab" data-category="personas">
+                <span class="tab-icon">👥</span>
+                <span class="tab-label">Personas</span>
+            </button>
+            <button class="category-tab" data-category="lugares">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">Lugares</span>
+            </button>
+            <button class="category-tab" data-category="objetos">
+                <span class="tab-icon">⚽</span>
+                <span class="tab-label">Objetos</span>
+            </button>
+            <button class="category-tab" data-category="comida">
+                <span class="tab-icon">🍕</span>
+                <span class="tab-label">Comida</span>
+            </button>
+            <button class="category-tab" data-category="cuerpo">
+                <span class="tab-icon">🖐️</span>
+                <span class="tab-label">Cuerpo</span>
+            </button>
+            <button class="category-tab" data-category="ropa">
+                <span class="tab-icon">👕</span>
+                <span class="tab-label">Ropa</span>
+            </button>
+        </nav>
+        </div><!-- /.main-area -->
+
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="searchOverlay">
+            <div class="search-box">
+                <div class="search-input-row">
+                    <input type="text" id="searchInput" placeholder="Buscar pictograma...">
+                    <button id="searchClose">✕</button>
+                </div>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de edicion de pictograma -->
+    <div class="edit-modal-overlay" id="editModalOverlay">
+        <div class="edit-modal">
+            <img class="edit-modal-image" id="editModalImage" src="" alt="">
+            <div class="edit-modal-original" id="editModalOriginal">Original: </div>
+            <input type="text" class="edit-modal-input" id="editModalInput" placeholder="Nombre personalizado">
+            <div class="edit-modal-actions">
+                <button class="edit-modal-btn edit-modal-save" id="editModalSave">Guardar</button>
+                <button class="edit-modal-btn edit-modal-hide" id="editModalHide">Ocultar</button>
+                <button class="edit-modal-btn edit-modal-cancel" id="editModalCancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/database.js"></script>
+    <script src="src/pictograms-data.js"></script>
+    <script src="src/pictograms-library.js"></script>
+    <script src="src/app.js"></script>
+    
+    <!-- Service Worker para PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registrado', reg))
+                .catch(err => console.error('SW error', err));
+        }
+    </script>
+</body>
+</html>

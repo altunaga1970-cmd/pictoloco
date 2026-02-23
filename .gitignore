@@ -1,0 +1,6 @@
+node_modules/
+temp_*.json
+debug.html
+start.html
+.claude/
+package.json
