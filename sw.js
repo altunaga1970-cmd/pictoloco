@@ -3,16 +3,16 @@
  * Cachea recursos para funcionamiento offline
  */
 
-const CACHE_NAME = 'pictoloco-v5';  // v5: sistema aumentativo con libreria expandida
+const CACHE_NAME = 'pictoloco-v6';  // v6: rutas relativas para GitHub Pages
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/styles/main.css',
-    '/src/database.js',
-    '/src/pictograms-data.js',
-    '/src/pictograms-library.js',
-    '/src/app.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './styles/main.css',
+    './src/database.js',
+    './src/pictograms-data.js',
+    './src/pictograms-library.js',
+    './src/app.js',
+    './manifest.json'
 ];
 
 // Imágenes de ARASAAC (cache dinámico)
@@ -106,7 +106,7 @@ async function handleStaticRequest(request) {
     } catch (error) {
         // Offline - retornar offline page si es HTML
         if (request.headers.get('accept').includes('text/html')) {
-            return caches.match('/index.html');
+            return caches.match('./index.html');
         }
         throw error;
     }

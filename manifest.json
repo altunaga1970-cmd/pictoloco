@@ -2,7 +2,7 @@
   "name": "PictoLoco - Comunicación Aumentativa",
   "short_name": "PictoLoco",
   "description": "Aplicación de comunicación con pictogramas ARASAAC para personas autistas no verbales",
-  "start_url": "/index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#f5f6fa",
   "theme_color": "#6c5ce7",
