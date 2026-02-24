@@ -353,6 +353,7 @@ class PictoLocoApp {
         let pressTimer = null;
         let isLongPress = false;
         let didScroll = false;
+        let usedTouch = false;
         let startX = 0, startY = 0;
 
         const startPress = (e) => {
@@ -374,7 +375,7 @@ class PictoLocoApp {
             }, 200);
         };
 
-        const endPress = (e) => {
+        const endPress = () => {
             clearTimeout(pressTimer);
             pressTimer = null;
             element.classList.remove('long-pressing');
@@ -399,10 +400,13 @@ class PictoLocoApp {
         };
 
         // Touch events - all passive to not block scroll
-        element.addEventListener('touchstart', startPress, { passive: true });
+        element.addEventListener('touchstart', (e) => {
+            usedTouch = true;
+            startPress(e);
+        }, { passive: true });
         element.addEventListener('touchend', (e) => {
             if (isLongPress) e.preventDefault();
-            endPress(e);
+            endPress();
         });
         element.addEventListener('touchmove', cancelPress, { passive: true });
         element.addEventListener('touchcancel', () => {
@@ -411,12 +415,19 @@ class PictoLocoApp {
             element.classList.remove('long-pressing');
         });
 
-        // Mouse events (for desktop)
+        // Mouse events (for desktop only - skip if touch was used)
         element.addEventListener('mousedown', (e) => {
+            if (usedTouch) return;
             if (e.button === 0) startPress(e);
         });
-        element.addEventListener('mouseup', endPress);
-        element.addEventListener('mousemove', cancelPress);
+        element.addEventListener('mouseup', () => {
+            if (usedTouch) { usedTouch = false; return; }
+            endPress();
+        });
+        element.addEventListener('mousemove', (e) => {
+            if (usedTouch) return;
+            cancelPress(e);
+        });
         element.addEventListener('mouseleave', () => {
             clearTimeout(pressTimer);
             pressTimer = null;
