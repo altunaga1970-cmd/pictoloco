@@ -352,10 +352,12 @@ class PictoLocoApp {
     _attachLongPress(element, picto, onClick) {
         let pressTimer = null;
         let isLongPress = false;
+        let didScroll = false;
         let startX = 0, startY = 0;
 
         const startPress = (e) => {
             isLongPress = false;
+            didScroll = false;
             const touch = e.touches ? e.touches[0] : e;
             startX = touch.clientX;
             startY = touch.clientY;
@@ -377,24 +379,26 @@ class PictoLocoApp {
             pressTimer = null;
             element.classList.remove('long-pressing');
 
-            if (!isLongPress) {
+            if (!isLongPress && !didScroll) {
                 onClick();
             }
         };
 
         const cancelPress = (e) => {
-            if (!pressTimer) return;
             const touch = e.touches ? e.touches[0] : e;
             const dx = Math.abs(touch.clientX - startX);
             const dy = Math.abs(touch.clientY - startY);
-            if (dx > 10 || dy > 10) {
-                clearTimeout(pressTimer);
-                pressTimer = null;
-                element.classList.remove('long-pressing');
+            if (dx > 8 || dy > 8) {
+                didScroll = true;
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                    element.classList.remove('long-pressing');
+                }
             }
         };
 
-        // Touch events
+        // Touch events - all passive to not block scroll
         element.addEventListener('touchstart', startPress, { passive: true });
         element.addEventListener('touchend', (e) => {
             if (isLongPress) e.preventDefault();
@@ -412,16 +416,11 @@ class PictoLocoApp {
             if (e.button === 0) startPress(e);
         });
         element.addEventListener('mouseup', endPress);
+        element.addEventListener('mousemove', cancelPress);
         element.addEventListener('mouseleave', () => {
             clearTimeout(pressTimer);
             pressTimer = null;
             element.classList.remove('long-pressing');
-        });
-
-        // Prevent default click (we handle it in endPress)
-        element.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
         });
     }
 
