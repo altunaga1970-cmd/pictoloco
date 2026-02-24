@@ -353,23 +353,24 @@ class PictoLocoApp {
         let pressTimer = null;
         let isLongPress = false;
         let didScroll = false;
-        let usedTouch = false;
+        let handled = false;
         let startX = 0, startY = 0;
+        let pointerType = null;
 
-        const startPress = (e) => {
+        const startPress = (x, y) => {
             isLongPress = false;
             didScroll = false;
-            const touch = e.touches ? e.touches[0] : e;
-            startX = touch.clientX;
-            startY = touch.clientY;
+            handled = false;
+            startX = x;
+            startY = y;
 
             pressTimer = setTimeout(() => {
                 isLongPress = true;
+                handled = true;
                 element.classList.remove('long-pressing');
                 this.openEditModal(picto);
             }, 600);
 
-            // Visual feedback
             setTimeout(() => {
                 if (pressTimer) element.classList.add('long-pressing');
             }, 200);
@@ -380,15 +381,15 @@ class PictoLocoApp {
             pressTimer = null;
             element.classList.remove('long-pressing');
 
-            if (!isLongPress && !didScroll) {
+            if (!handled && !isLongPress && !didScroll) {
+                handled = true;
                 onClick();
             }
         };
 
-        const cancelPress = (e) => {
-            const touch = e.touches ? e.touches[0] : e;
-            const dx = Math.abs(touch.clientX - startX);
-            const dy = Math.abs(touch.clientY - startY);
+        const cancelMove = (x, y) => {
+            const dx = Math.abs(x - startX);
+            const dy = Math.abs(y - startY);
             if (dx > 8 || dy > 8) {
                 didScroll = true;
                 if (pressTimer) {
@@ -399,39 +400,52 @@ class PictoLocoApp {
             }
         };
 
-        // Touch events - all passive to not block scroll
+        // Touch events
         element.addEventListener('touchstart', (e) => {
-            usedTouch = true;
-            startPress(e);
+            pointerType = 'touch';
+            const t = e.touches[0];
+            startPress(t.clientX, t.clientY);
         }, { passive: true });
+
         element.addEventListener('touchend', (e) => {
             if (isLongPress) e.preventDefault();
             endPress();
         });
-        element.addEventListener('touchmove', cancelPress, { passive: true });
+
+        element.addEventListener('touchmove', (e) => {
+            const t = e.touches[0];
+            cancelMove(t.clientX, t.clientY);
+        }, { passive: true });
+
         element.addEventListener('touchcancel', () => {
             clearTimeout(pressTimer);
             pressTimer = null;
             element.classList.remove('long-pressing');
         });
 
-        // Mouse events (for desktop only - skip if touch was used)
+        // Mouse events (desktop only)
         element.addEventListener('mousedown', (e) => {
-            if (usedTouch) return;
-            if (e.button === 0) startPress(e);
+            if (pointerType === 'touch') return;
+            pointerType = 'mouse';
+            if (e.button === 0) startPress(e.clientX, e.clientY);
         });
+
         element.addEventListener('mouseup', () => {
-            if (usedTouch) { usedTouch = false; return; }
+            if (pointerType !== 'mouse') { pointerType = null; return; }
             endPress();
+            pointerType = null;
         });
+
         element.addEventListener('mousemove', (e) => {
-            if (usedTouch) return;
-            cancelPress(e);
+            if (pointerType !== 'mouse') return;
+            cancelMove(e.clientX, e.clientY);
         });
+
         element.addEventListener('mouseleave', () => {
             clearTimeout(pressTimer);
             pressTimer = null;
             element.classList.remove('long-pressing');
+            pointerType = null;
         });
     }
 
