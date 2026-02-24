@@ -408,7 +408,7 @@ class PictoLocoApp {
         }, { passive: true });
 
         element.addEventListener('touchend', (e) => {
-            if (isLongPress) e.preventDefault();
+            e.preventDefault();
             endPress();
         });
 
@@ -535,9 +535,13 @@ class PictoLocoApp {
     // =============================================
 
     /**
-     * Agregar pictograma a la oracion
+     * Agregar pictograma a la oracion (con debounce anti-duplicado)
      */
     addPictoToSentence(picto, card = null) {
+        const now = Date.now();
+        if (this._lastAddTime && now - this._lastAddTime < 300) return;
+        this._lastAddTime = now;
+
         this.state.sentence.push(picto);
         this.updateSentenceDisplay();
         this.playSound('select');
@@ -547,9 +551,6 @@ class PictoLocoApp {
         if (card) {
             card.classList.add('added');
             setTimeout(() => card.classList.remove('added'), 500);
-        }
-
-        if (card) {
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
